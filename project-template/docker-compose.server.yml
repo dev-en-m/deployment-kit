@@ -1,0 +1,23 @@
+# Copy to the server as /srv/apps/<repo-name>/docker-compose.yml
+# Next to it, create /srv/apps/<repo-name>/.env with:
+#   IMAGE_TAG=latest
+#   DATABASE_URL=postgres://invoicer:xxx@postgres:5432/invoicer
+#   REDIS_URL=redis://redis:6379/0
+#   ...any other secrets
+# GitHub Actions updates IMAGE_TAG on every deploy.
+
+services:
+  app:
+    image: ghcr.io/<github-user>/<repo-name>:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      # 127.0.0.1 only: reachable through nginx, never directly from the internet.
+      # Give each project its own port (3001, 3002, ...).
+      - "127.0.0.1:3001:3000"
+    mem_limit: 256m
+    networks: [shared]
+
+networks:
+  shared:
+    external: true

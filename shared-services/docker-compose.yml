@@ -1,0 +1,40 @@
+# Lives on the server at /srv/shared/docker-compose.yml
+# ONE Postgres and ONE Redis for all projects (saves a lot of RAM).
+# Put POSTGRES_PASSWORD=... in /srv/shared/.env, then: docker compose up -d
+#
+# Create a database per project:
+#   docker exec -it postgres psql -U postgres -c "CREATE USER invoicer WITH PASSWORD 'xxx';"
+#   docker exec -it postgres psql -U postgres -c "CREATE DATABASE invoicer OWNER invoicer;"
+# Apps connect with host "postgres" and "redis" (same Docker network).
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    command: >
+      postgres
+      -c shared_buffers=64MB
+      -c work_mem=4MB
+      -c max_connections=60
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    mem_limit: 384m
+    networks: [shared]
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 64mb --maxmemory-policy allkeys-lru
+    mem_limit: 96m
+    networks: [shared]
+
+volumes:
+  pgdata:
+
+networks:
+  shared:
+    external: true
