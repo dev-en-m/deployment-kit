@@ -8,7 +8,7 @@ name: Deploy
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # adds a "Run workflow" button (pick any branch/commit to redeploy)
+  workflow_dispatch:   # adds a "Run workflow" button (redeploys the latest commit of a branch)
 
 permissions:
   contents: read
@@ -65,4 +65,5 @@ jobs:
             fi
             docker compose pull
             docker compose up -d --remove-orphans
-            docker image prune -f
+            # Old SHA-tagged images are never dangling; -a removes them. Keep a week for rollback.
+            docker image prune -af --filter until=168h

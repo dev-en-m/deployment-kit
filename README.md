@@ -200,16 +200,16 @@ To redeploy without a code change, or to deploy another branch, use **Actions â†
 
 ### Rolling back
 
-You can roll back either way:
+Roll back on the server. Every deploy's image is still in the registry, tagged with its commit SHA. (**Run workflow** can't roll back: it always builds the latest commit of the branch you pick.)
 
-- **From GitHub:** use **Run workflow** on an older commit.
-- **On the server:** this is faster, because the old image is still in the registry.
-  ```bash
-  ssh demo
-  cd /srv/apps/invoicer
-  nano .env                  # set IMAGE_TAG=<old commit SHA>
-  docker compose pull && docker compose up -d
-  ```
+```bash
+ssh demo
+cd /srv/apps/invoicer
+nano .env                  # set IMAGE_TAG=<old commit SHA>
+docker compose pull && docker compose up -d
+```
+
+The next push to `main` deploys over the rollback, so revert the bad commit in git too.
 
 ### Managing from your PC
 

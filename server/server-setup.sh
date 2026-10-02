@@ -28,9 +28,9 @@ if ! id deploy >/dev/null 2>&1; then
 fi
 usermod -aG docker deploy
 mkdir -p /home/deploy/.ssh
-# Start with the same key you use for the ubuntu user.
-# Later, append the GitHub Actions public key to this file too.
-cp /home/ubuntu/.ssh/authorized_keys /home/deploy/.ssh/authorized_keys
+# Start with the same key you use for the ubuntu user (first run only, so a
+# re-run keeps the GitHub Actions key you append later).
+[ -f /home/deploy/.ssh/authorized_keys ] || cp /home/ubuntu/.ssh/authorized_keys /home/deploy/.ssh/authorized_keys
 chown -R deploy:deploy /home/deploy/.ssh
 chmod 700 /home/deploy/.ssh
 chmod 600 /home/deploy/.ssh/authorized_keys
