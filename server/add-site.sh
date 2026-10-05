@@ -25,6 +25,8 @@ server {
     client_max_body_size 20m;
 
     location / {
+        limit_req zone=loopapi burst=10 nodelay;
+        limit_req_status 429;
         proxy_pass http://127.0.0.1:$PORT;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;

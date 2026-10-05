@@ -56,6 +56,8 @@ map $http_upgrade $connection_upgrade {
     ''      close;
 }
 EOF
+# Per-IP rate limit zone, used by every site's location block
+echo 'limit_req_zone $binary_remote_addr zone=loopapi:10m rate=10r/s;' > /etc/nginx/conf.d/ratelimit.conf
 nginx -t && systemctl reload nginx
 systemctl enable --now fail2ban
 
